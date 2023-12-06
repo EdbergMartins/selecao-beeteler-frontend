@@ -1,6 +1,5 @@
-import { CustomTheme } from 'types/theme';
 
-const defaultTheme: CustomTheme = {
+const defaultTheme = {
   palette: {
     mode: 'light',
     primary: {

@@ -6,98 +6,85 @@ import bitCoinSign from '../../../assets/bitCoinSign.svg';
 import dollarSign from '../../../assets/dollarSign.svg';
 import { useStyles } from './styles';
 
-interface AlertMessageProps {
-  typeCoin?: string;
-  listCoin?: [];
-  isLoading?: boolean
+interface CoinData {
+  name?: string;
+  create_date?: string;
+  low?: number;
+  high?: number;
+  pctChange?: number;
+  varBid?: string;
+  dateQuote?: string;
 }
 
-function CoinCard({ typeCoin, listCoin, isLoading }: AlertMessageProps) {
+interface CoinCardProps {
+  typeCoin?: string;
+  listCoin?: CoinData[];
+  isLoading?: boolean;
+}
 
+function CoinCard({ typeCoin, listCoin, isLoading }: CoinCardProps) {
   const styles = useStyles();
-  const [listCoins, setListCoins] = useState(listCoin);
+  const [listCoins, setListCoins] = useState<CoinData[]>(listCoin || []);
   const [sortOrder, setSortOrder] = useState("asc");
-  const name = listCoin[0]?.name?.split('/')[0]
-  const initialDate = listCoin[0]?.create_date.split(' ')[0].split('-').join('/')
+  const name = listCoin && listCoin.length > 0 ? listCoin[0]?.name?.split('/')[0] : '';
+  const initialDate = listCoin && listCoin.length > 0 ? listCoin[0]?.create_date?.split(' ')[0].split('-').join('/') : '';
 
   useEffect(() => {
-    if (listCoins?.length === 0) {
-      setListCoins(listCoin)
-      dateQuote(listCoins)
+    if (listCoins.length === 0 && listCoin) {
+      setListCoins(listCoin);
+      dateQuote(listCoin);
     }
-  }, [listCoin])
+  }, [listCoin]);
 
-
-
-  const dateQuote = (date) => {
-    const newList = listCoin
-    const milisegonds = Date.parse(initialDate);
+  const dateQuote = (date: CoinData[]) => {
+    const newList = date;
+    const milisegonds = Date.parse(initialDate || '');
     newList?.forEach((element, index) => {
       if (index === 0) {
-        var data = new Date(milisegonds);
+        const data = new Date(milisegonds);
         const day = data.getDate();
         const month = data.getMonth() + 1;
         const year = data.getFullYear();
-        element.dateQuote = `${day}/${month}/${year}`
+        element.dateQuote = `${day}/${month}/${year}`;
       } else {
-        const constOldDate = (milisegonds - (1000 * 60 * 60 * 24 * (index)))
+        const constOldDate = milisegonds - (1000 * 60 * 60 * 24 * index);
         const data = new Date(constOldDate);
         const day = data.getDate();
         const month = data.getMonth() + 1;
         const year = data.getFullYear();
-        element.dateQuote = `${day}/${month}/${year}`
+        element.dateQuote = `${day}/${month}/${year}`;
       }
-
-    })
-  }
+    });
+  };
 
   const enumTypeCoins = () => {
     if (typeCoin === 'USD-BRL') {
-      return (<img style={{ height: '100%', float: 'right' }} src={dollarSign} />)
+      return (<img style={{ height: '100%', float: 'right' }} src={dollarSign} alt="Dollar Sign" />);
     } else if (typeCoin === 'BTC-BRL') {
-      return (<img style={{ height: '100%', float: 'right' }} src={bitCoinSign} />)
+      return (<img style={{ height: '100%', float: 'right' }} src={bitCoinSign} alt="Bitcoin Sign" />);
     } else {
-      return (<EuroIcon sx={{ fill: 'black' }} />)
+      return (<EuroIcon sx={{ fill: 'black' }} />);
     }
-
-  }
-
-
+  };
 
   const handleSortLow = () => {
     const newOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newOrder);
-    const sortedlistCoins = [...listCoins].sort((a, b) => {
-      if (newOrder === "asc") {
-        return a.low - b.low;
-      } else {
-        return b.low - a.low;
-      }
-    });
+    const sortedlistCoins = [...listCoins].sort((a, b) => (newOrder === "asc" ? a.low! - b.low! : b.low! - a.low!));
     setListCoins(sortedlistCoins);
   };
+
   const handleSortHigh = () => {
     const newOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newOrder);
-    const sortedlistCoins = [...listCoins].sort((a, b) => {
-      if (newOrder === "asc") {
-        return a.high - b.high;
-      } else {
-        return b.high - a.high;
-      }
-    });
+    const sortedlistCoins = [...listCoins].sort((a, b) => (newOrder === "asc" ? a.high! - b.high! : b.high! - a.high!));
     setListCoins(sortedlistCoins);
   };
+
   const handleSortPct = () => {
     const newOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newOrder);
-    const sortedlistCoins = [...listCoins].sort((a, b) => {
-      if (newOrder === "asc") {
-        return a.pctChange - b.pctChange;
-      } else {
-        return b.pctChange - a.pctChange;
-      }
-    });
+    const sortedlistCoins = [...listCoins].sort((a, b) => (newOrder === "asc" ? a.pctChange! - b.pctChange! : b.pctChange! - a.pctChange!));
     setListCoins(sortedlistCoins);
   };
 
@@ -124,63 +111,59 @@ function CoinCard({ typeCoin, listCoin, isLoading }: AlertMessageProps) {
           </TableCell>
         </TableRow>
       </TableHead>
-      {!isLoading ? 
-      <TableBody className={styles.pairCoins}>
-          {listCoins.map((data, index) =>
-            <TableRow style={{ display: 'flex', flexDirection: 'row', width: '100vw', maxWidth: '1170px' }}>
+      {!isLoading ? (
+        <TableBody className={styles.pairCoins}>
+          {listCoins.map((data, index) => (
+            <TableRow key={index} style={{ display: 'flex', flexDirection: 'row', width: '100vw', maxWidth: '1170px' }}>
               <TableCell className={styles.cellBody}>
-            <span className={styles.yellowCircles}>
-              {enumTypeCoins()}
-            </span>
-            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontWeight: 'bold', color: 'black' }}>
+                <span className={styles.yellowCircles}>
+                  {enumTypeCoins()}
+                </span>
+                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontWeight: 'bold', color: 'black' }}>
                     {name}
-              </span>
-              <span>
+                  </span>
+                  <span>
                     {data.dateQuote}
-              </span>
-            </Box>
-          </TableCell>
+                  </span>
+                </Box>
+              </TableCell>
               <TableCell className={styles.cellBody} style={{}}>
                 <span className={styles.valueQuote}>
                   {data.low}
-
-            </span>
-          </TableCell>
+                </span>
+              </TableCell>
               <TableCell className={styles.cellBody} style={{}}>
-            <span className={styles.valueQuote}>
+                <span className={styles.valueQuote}>
                   {data.high}
-            </span>
-          </TableCell>
+                </span>
+              </TableCell>
               <TableCell className={styles.cellBody} style={{}} align="right">
-              <span style={data.varBid.includes('-') ? { background: 'rgba(224, 224, 224, 1)' } : { background: 'rgba(244, 194, 59, 1)' }} className={styles.variantQuote}>
-                {`${(data.pctChange)}%`}
-            </span>
-          </TableCell>
-        </TableRow>
-        )}
+                <span style={data.varBid?.includes('-') ? { background: 'rgba(224, 224, 224, 1)' } : { background: 'rgba(244, 194, 59, 1)' }} className={styles.variantQuote}>
+                  {`${(data.pctChange)}%`}
+                </span>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
-        :
-        new Array(15).fill(0).map((_, index) => {
-          return (
-            <Box style={{ display: 'flex' }} className={styles.pairCoins} key={index}>
-              <Skeleton variant="circular" width={70} height={70} />
-              <Box style={{ display: 'flex', flexDirection: 'column' }}>
-                <Skeleton width="100px" height='40px' />
-                <Skeleton width="100px" height='30px' />
-              </Box>
-              <Box style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                <Skeleton width="100px" height='40px' style={{ marginLeft: '22%' }} />
-                <Skeleton width="100px" height='40px' style={{ marginLeft: '22%' }} />
-                <Skeleton width="100px" height='40px' style={{ marginLeft: '22%' }} />
-              </Box>
-            </Box>)
-        })
-      }
+      ) : (
+        new Array(15).fill(0).map((_, index) => (
+          <Box key={index} style={{ display: 'flex' }} className={styles.pairCoins}>
+            <Skeleton variant="circular" width={70} height={70} />
+            <Box style={{ display: 'flex', flexDirection: 'column' }}>
+              <Skeleton width="100px" height='40px' />
+              <Skeleton width="100px" height='30px' />
+            </Box>
+            <Box style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+              <Skeleton width="100px" height='40px' style={{ marginLeft: '22%' }} />
+              <Skeleton width="100px" height='40px' style={{ marginLeft: '22%' }} />
+              <Skeleton width="100px" height='40px' style={{ marginLeft: '22%' }} />
+            </Box>
+          </Box>
+        ))
+      )}
     </>
   );
-
-
 }
 
 export default CoinCard;
