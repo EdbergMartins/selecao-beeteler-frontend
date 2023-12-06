@@ -21,7 +21,7 @@ function RegisterPage() {
   const handleSubmit = async (values: any, actions: any) => {
     const { email, password } = values
     try {
-      const response = await axios.post('http://localhost:3000/singUp',
+      const response = await axios.post('https://app-82f2b56d-a8f6-4dbf-994b-8b3cb75e26aa.cleverapps.io/singUp',
         JSON.stringify({ email, password }),
         {
           headers: { 'Content-Type': 'application/json' }
