@@ -21,7 +21,7 @@ function HomePage() {
   const handleSubmit = async (values: FormValues, actions: FormikHelpers<FormValues>) => {
     const { email, password } = values;
     try {
-      const response = await axios.post('https://app-82f2b56d-a8f6-4dbf-994b-8b3cb75e26aa.cleverapps.io/singIn', {
+      const response = await axios.post('https://beeteler-chalanger.onrender.com/singIn', {
         email,
         password,
       });

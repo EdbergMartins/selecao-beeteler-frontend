@@ -16,7 +16,7 @@ function RegisterPage() {
     const { email, password } = values;
     try {
       const response = await axios.post(
-        'https://app-82f2b56d-a8f6-4dbf-994b-8b3cb75e26aa.cleverapps.io/singUp',
+        'https://beeteler-chalanger.onrender.com/singUp',
         { email, password },
         {
           headers: { 'Content-Type': 'application/json' },
